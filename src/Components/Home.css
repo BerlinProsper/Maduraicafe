@@ -1,0 +1,281 @@
+/* Make the wrapper take full height and center content */
+.fullscreen-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* full viewport height */
+  width: 100vw;  /* full viewport width */
+  box-sizing: border-box;
+  background-color: #F5D8A0; /* optional: light neutral background */
+}
+
+/* Optional: style for the main container */
+.homepage-container {
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 2rem;
+  max-width: 90%;
+}
+
+/* Title styles (unchanged or modify as needed) */
+.title {
+  color: #633B11; /* a professional green tone */
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* Style for the card container */
+.card-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem; /* smaller gap for smaller cards */
+  flex-wrap: wrap;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Style for individual cards */
+.card {
+  background-color: #E7B253; /* Aesthetic professional color, teal/blue-green */
+  color: #fff; /* white text for contrast */
+  padding: 1.2rem; /* smaller padding for smaller size */
+  border-radius: 12px;
+  width: 140px; /* smaller width */
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 8px rgba(76, 125, 126, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.02);
+  background-color: #E5B635; /* lighter shade for hover */
+  box-shadow: 0 6px 12px rgba(76, 125, 126, 0.3);
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.8px;
+  color: #fff;
+  text-align: center;
+}/* Container styles */
+.category-page {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #e3c983;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Title styling */
+.title {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #633B11;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Label styling */
+.label {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Custom dropdown for a professional look */
+
+.custom-dropdown {
+  position: relative;
+  width: 180px; /* set a fixed width for a smaller size */
+  margin: 0 auto;
+  padding: 0.25rem 0.75rem; /* reduce padding for a more compact look */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.styled-select {
+  border: none;
+  font-size: 0.85rem; /* smaller font size */
+  padding: 0.25rem 0.5rem; /* smaller padding inside select */
+  border-radius: 6px;
+  appearance: none;
+  background-color: transparent;
+  cursor: pointer;
+  width: 100%; /* fill the container */
+}
+
+/* Optionally add a custom arrow */
+.custom-dropdown::after {
+  content: '▼';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Container to center the label and day labels vertically and horizontally */
+.schedule-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* horizontally center all items */
+  margin-bottom: 16px;
+}
+
+/* Center the "Scheduled to check on" text */
+.schedule-label {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 12px; /* space between label and day labels */
+  text-align: center;
+}
+
+/* Style for day labels - inline, spaced out, and look different from buttons */
+.day-labels {
+  display: flex;
+  gap: 3px; /* space between days */
+  flex-wrap: wrap; /* allow wrapping if needed */
+}
+
+/* Style for individual day labels */
+.day-label {
+  font-size: 0.65rem;
+  padding: 6px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  color: #333;
+  background-color: #e0e0e0; /* light background */
+  user-select: none; /* prevent text selection on click */
+}
+
+.day-label:hover {
+  background-color: #d0d0d0; /* darker on hover */
+  transform: scale(1.05);
+}
+
+/* Style for selected day */
+.day-label.active {
+  background-color: #633b11; /* dark background for active */
+  color: #fff; /* white text */
+  font-weight: bold;
+}
+/* Card container */
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Smaller cards for better fit */
+.card {
+  background-color: #E7B253;
+  color: #fff;
+  width: 180px;
+  padding: 0.8rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9rem;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Card title styling */
+.card-title {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  text-align: center;
+}
+/* Popup overlay styling */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* increase z-index for priority */
+  box-sizing: border-box;
+}
+
+.popup {
+  background: #b1b642;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 250px;
+  width: 80%; /* slightly larger for better visibility */
+  box-sizing: border-box;
+  /* Optional: add transition for smooth appearance */
+  transition: all 0.3s ease;
+}
+
+.popup button {
+  margin: 1rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #633b11;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.popup button:hover {
+  background-color: #4a2f0f;
+}.card.checked {
+  background-color: #633b11;
+}
+.card.not-checked {
+  background-color: #E7B253;
+}
+/* Spinner styles */
+
+.loading-spinner-large {
+  border: 6px solid #f3f3f3; /* Light grey */
+  border-top: 6px solid #333; /* Dark */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto; /* center horizontally with margin */
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* or adjust as needed */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
