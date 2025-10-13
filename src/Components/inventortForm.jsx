@@ -8,7 +8,7 @@ const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'satur
 export default function AddInventoryItem() {
   const [formData, setFormData] = useState({
     name: '',
-    category: 'ingredient',
+    category: 'Front',
     checkFrequency: 'daily',
     lastChecked: new Date().toISOString(),
     isAvailable: false,
