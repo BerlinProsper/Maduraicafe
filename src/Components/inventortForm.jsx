@@ -68,7 +68,7 @@ export default function AddInventoryItem() {
       });
 setFormData({
         name: '',
-        category: 'Front',
+        category: formData.category,
         checkFrequency: 'daily',
         lastChecked: new Date().toISOString(),
         isAvailable: false,
