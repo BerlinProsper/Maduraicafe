@@ -66,13 +66,12 @@ export default function AddInventoryItem() {
         ...dataToSave,
         createdAt: serverTimestamp()
       });
-setFormData({
+setFormData({...formData,
         name: '',
-        category: formData.category,
-        checkFrequency: formData.checkFrequency,
+        category: 'Front',
+        checkFrequency: 'daily',
         lastChecked: new Date().toISOString(),
         isAvailable: false,
-        checkDays: weekDays,
       });
     } catch (e) {
       console.error(e);
