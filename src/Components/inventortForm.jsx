@@ -69,7 +69,7 @@ export default function AddInventoryItem() {
 setFormData({
         name: '',
         category: formData.category,
-        checkFrequency: formData.Frequency,
+        checkFrequency: formData.checkFrequency,
         lastChecked: new Date().toISOString(),
         isAvailable: false,
         checkDays: weekDays,
