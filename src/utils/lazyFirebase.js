@@ -9,16 +9,19 @@ export async function getDb() {
   initializing = (async () => {
     const { initializeApp } = await import('firebase/app');
     const { getFirestore } = await import('firebase/firestore');
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyATzJcuaUmfCVLIepdgUpYTlCkoSc0bLvk",
+  authDomain: "madurai-cafe.firebaseapp.com",
+  projectId: "madurai-cafe",
+  storageBucket: "madurai-cafe.firebasestorage.app",
+  messagingSenderId: "105593114345",
+  appId: "1:105593114345:web:4a4a49c9a19b8a1547ea78"
+};
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyByogNzbGuYOBOzN4a8xkJ2DjoY4lriUoI",
-      authDomain: "barbershop-58368.firebaseapp.com",
-      projectId: "barbershop-58368",
-      storageBucket: "barbershop-58368.firebasestorage.app",
-      messagingSenderId: "385585091708",
-      appId: "1:385585091708:web:7024d8a894c9c52972e5f9"
-    };
 
+
+    /////////
     const app = initializeApp(firebaseConfig);
     cachedDb = getFirestore(app);
     return cachedDb;
