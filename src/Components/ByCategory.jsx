@@ -4,7 +4,7 @@ import "./Category.css";
 import { useMyContext } from "../Contexts/myContext";
 // load html2canvas and jspdf dynamically inside handler to keep them out of main bundle
 
-const categories = ["ALL", "ingredient", "utensil", "food", "beverage"];
+const categories = ['ALL','Front','Hot Servings', 'Deep fry ','Sauces', 'Breads', 'Grill and others','Confectionery','Boxes','Utensils counter','Walk in Freezer','Walk in Cooler','Drinks','Freezer-Outside']; 
 const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 const today = new Date();
 const todayDay = daysOfWeek[today.getDay()];
