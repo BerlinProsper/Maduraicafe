@@ -4,7 +4,7 @@ import { getDb } from '../utils/lazyFirebase';
 const categories = ['Front','Hot Servings', 'Deep fry ','Sauces', 'Breads', 'Grill and others','Confectionery','Boxes','Utensils counter','Walk in Freezer','Walk in Cooler','Drinks','Freezer-Outside']; 
 const frequencies = ['daily','selected days'];
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
+ 
 export default function AddInventoryItem() {
   const [formData, setFormData] = useState({
     name: '',
@@ -69,7 +69,7 @@ export default function AddInventoryItem() {
 setFormData({
         name: '',
         category: formData.category,
-        checkFrequency: 'daily',
+        checkFrequency: formData.Frequency,
         lastChecked: new Date().toISOString(),
         isAvailable: false,
         checkDays: weekDays,
