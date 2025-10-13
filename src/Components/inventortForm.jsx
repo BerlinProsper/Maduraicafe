@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from '../Firebase';
+import { getDb } from '../utils/lazyFirebase';
 
-const categories = ['ingredient', 'utensil', 'food', 'beverage']; 
-const frequencies = ['daily', 'every 2 days', 'every 3 days', 'every 4 days', 'weekly'];
+const categories = ['Front','Hot Servings', 'Deep fry -1','Sauces-2', 'Breads', 'Grill and others','Confectionery','Boxes','Utensils counter','Walk in Freezer','Walk in Cooler','Drinks','Freezer-Outside']; 
+const frequencies = ['daily','selected days'];
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 export default function AddInventoryItem() {
@@ -58,6 +57,11 @@ export default function AddInventoryItem() {
     };
 
     try {
+      const db = await getDb();
+      const [{ collection, addDoc, serverTimestamp }] = await Promise.all([
+        import('firebase/firestore'),
+      ]).then(mods => [mods[0]]);
+
       const docRef = await addDoc(collection(db, "inventory"), {
         ...dataToSave,
         createdAt: serverTimestamp()

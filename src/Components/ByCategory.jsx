@@ -1,40 +1,202 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import "./Category.css"; 
+// load firebase/firestore dynamically where needed to avoid bundling it into the main chunk
 import { useMyContext } from "../Contexts/myContext";
-import "./Category.css";
-import { db } from '../Firebase';
-import { collection, query, where, getDocs, deleteDoc, doc, setDoc } from 'firebase/firestore';
+// load html2canvas and jspdf dynamically inside handler to keep them out of main bundle
 
 const categories = ["ALL", "ingredient", "utensil", "food", "beverage"];
-const allDays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+const today = new Date();
+const todayDay = daysOfWeek[today.getDay()];
+const allDays = [todayDay];
 
 const InventoryCheckByCategoryAndDay = () => {
+  const { checkingDatabase } = useMyContext();
   const [inventory, setInventory] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [selectedDay, setSelectedDay] = useState("");
   const [rotatedWeekdays, setRotatedWeekdays] = useState([]);
   const [currentItem, setCurrentItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [popupData, setPopupData] = useState({ visible: false, item: null });
+  const [statusUpdate, setStatusUpdate] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const pdfRef = useRef();
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
-  // Rotate weekdays based on today
+  // Inject responsive + PDF styles
   useEffect(() => {
-    const todayIndex = new Date().getDay(); // 0 = Sunday
-    const rotated = [...allDays.slice(todayIndex), ...allDays.slice(0, todayIndex)];
-    setRotatedWeekdays(rotated);
-    setSelectedDay(rotated[0]); // Default: today
+    const style = document.createElement("style");
+    style.setAttribute("data-inventory-pdf", "true");
+    style.innerHTML = `
+      @media (max-width: 600px) {
+        body {
+          font-size: 8px;
+        }
+        h2, h3 {
+          font-size: 13px !important;
+          text-align: center;
+        }
+        li {
+          padding: 0.75rem !important;
+        }
+        li > div {
+          flex-direction: column !important;
+          gap: 8px;
+        }
+        li span {
+          font-size: 10px !important;
+        }
+        input, button {
+          font-size: 10px !important;
+        }
+        .tab-buttons {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      .pdf-mode {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 8px !important;
+        font-family: sans-serif !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .pdf-mode * {
+        background: none !important;
+        color: #000 !important;
+        font-size: 8px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      .pdf-mode li {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 5px !important;
+        border-bottom: 1px solid #ccc !important;
+        list-style: none !important;
+        padding: 2px 0 !important;
+        font-size: 8px !important;
+      }
+
+      .pdf-mode li > div {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* 👇 Shrink buttons ONLY inside PDF */
+      .pdf-mode button {
+        font-size: 5px !important;
+        padding: 1px 1px !important;
+        margin: 1px !important;
+        border-radius: 2px !important;
+        display: inline-block !important;
+      }
+
+      .pdf-mode .tab-buttons {
+        display: none !important;
+      }
+
+      .pdf-mode h2,
+      .pdf-mode h3,
+      .pdf-mode h4 {
+        font-size: 10px !important;
+        font-weight: bold;
+        margin: 6px 0;
+        text-align: left;
+      }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
   }, []);
 
- 
+  const handleDownloadPDF = async () => {
+    const input = pdfRef.current;
+    try {
+      // switch UI to grouped PDF layout
+      setIsGeneratingPDF(true);
+      // wait for the grouped layout to render
+      await new Promise((res) => setTimeout(res, 300));
 
-  // Fetch inventory for selected day
+      input.classList.add("pdf-mode");
+      // allow pdf-mode styles to apply
+      await new Promise((res) => setTimeout(res, 100));
+
+      // dynamically import heavy libs so they are code-split from main bundle
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf")
+      ]);
+
+      const canvas = await html2canvas(input, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save("records.pdf");
+    } catch (err) {
+      console.error("Error generating PDF:", err);
+    } finally {
+      // always restore UI
+      if (input) input.classList.remove("pdf-mode");
+      setIsGeneratingPDF(false);
+    }
+  };
+
+
+  useEffect(() => {
+    const todayIndex = new Date().getDay();
+    const rotated = [...allDays.slice(todayIndex), ...allDays.slice(0, todayIndex)];
+    setRotatedWeekdays(rotated);
+    setSelectedDay(rotated[0]);
+  }, []);
+
   useEffect(() => {
     fetchTodayInventory(selectedDay);
   }, [selectedDay]);
 
   const handleCategoryChange = (e) => {
-    const value = e.target.value;
-    setSelectedCategory(value);
-    setSelectedDay(rotatedWeekdays[0]); // Reset to today when category changes
+    setSelectedCategory(e.target.value);
+    setSelectedDay(rotatedWeekdays[0]);
+    setSearchTerm("");
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleCheckboxChange = (item) => {
@@ -46,44 +208,53 @@ const InventoryCheckByCategoryAndDay = () => {
     setPopupData({ visible: false, item: null });
   };
 
-  const handleConfirmCheck = async () => {
-    setPopupData({ visible: false, item: null });
-    setLoading(true);
-    if (currentItem) {
-      try {
-        const collectionRef = collection(db, selectedDay);
-        const q = query(
-          collectionRef,
-          where('date', '==', currentItem.date),
-          where('name', '==', currentItem.name)
-        );
-        const querySnapshot = await getDocs(q);
-try{
-        // Delete existing matching docs
-        const deletePromises = [];
-        querySnapshot.forEach((docSnap) => {
-          deletePromises.push(deleteDoc(doc(db, selectedDay, docSnap.id)));
-        });
-        await Promise.all(deletePromises);
-      }catch(err){
-        alert("Error deleting existing docs: ", err);
+  const handleConfirmCheck = async (e) => {
+    if (popupData.item !== "confirm") {
+      setStatusUpdate(e);
+      setPopupData({ visible: true, item: "confirm" });
+      return;
+    } else {
+      e = statusUpdate;
+      setPopupData({ visible: false, item: "confirm" });
+      setLoading(true);
+      if (currentItem) {
+        try {
+          const [{ collection, query, where, getDocs, deleteDoc, doc, setDoc }, { db }] = await Promise.all([
+            import('firebase/firestore'),
+            import('../Firebase')
+          ]);
+
+          const collectionRef = collection(db, selectedDay);
+          const q = query(
+            collectionRef,
+            where('date', '==', currentItem.date),
+            where('name', '==', currentItem.name)
+          );
+          const querySnapshot = await getDocs(q);
+          const deletePromises = [];
+          querySnapshot.forEach((docSnap) => {
+            deletePromises.push(deleteDoc(doc(db, selectedDay, docSnap.id)));
+          });
+          await Promise.all(deletePromises);
+          await setDoc(doc(collectionRef), { ...currentItem, status: e });
+          fetchTodayInventory(selectedDay);
+        } catch (error) {
+          console.error("Error updating check status: ", error);
+        }
       }
-        // Add new checked doc
-        await setDoc(doc(collectionRef), { ...currentItem, checked: "yes" });
-        fetchTodayInventory(selectedDay);
-      } catch (error) {
-        console.error("Error updating check status: ", error);
-      }
+      setLoading(false);
+      setCurrentItem(null);
     }
-    setLoading(false);
-    setCurrentItem(null);
   };
-
-
 
   const fetchTodayInventory = async (day) => {
     setLoading(true);
     try {
+      const [{ collection, getDocs }, { db }] = await Promise.all([
+        import('firebase/firestore'),
+        import('../Firebase')
+      ]);
+
       const inventoryToday = collection(db, day);
       const inventorySnapshot = await getDocs(inventoryToday);
       const inventoryList = inventorySnapshot.docs.map(doc => ({
@@ -105,12 +276,33 @@ try{
     return matchesCategory && matchesDay;
   });
 
-  // Sort items: unchecked ("no") first, checked ("yes") last
-  const sortedItems = filteredItems.slice().sort((a, b) => {
-    if (a.checked === b.checked) return 0;
-    if (a.checked === "no") return -1; // no items first
-    if (b.checked === "no") return 1;  // yes items last
-    return 0;
+  filteredItems.sort((a, b) => {
+    const order = {
+      "pending": 0,
+      "Need Immediately": 1,
+      "Need Soon": 2,
+      "We are Good": 3,
+    };
+    const priorityA = order[a.status] !== undefined ? order[a.status] : 99;
+    const priorityB = order[b.status] !== undefined ? order[b.status] : 99;
+    return priorityA - priorityB;
+  });
+
+  const searchedItems = filteredItems.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // group items by status for the PDF layout
+  const itemsByStatus = {
+    "Need Immediately": [],
+    "Need Soon": [],
+    "We are Good": [],
+    pending: [],
+  };
+
+  searchedItems.forEach((it) => {
+    const key = it.status && itemsByStatus[it.status] ? it.status : "pending";
+    itemsByStatus[key].push(it);
   });
 
   return (
@@ -133,92 +325,214 @@ try{
           </select>
         </div>
 
-        {selectedCategory && (
-          <>
-  <div className="schedule-container">
-  <div className="schedule-label">
-  </div>
-  
-  <div className="day-labels">
-    {rotatedWeekdays.map((day) => (
-  <span
-    key={day}
-    className={`day-label ${day === selectedDay ? "active" : ""}`}
-    onClick={() => setSelectedDay(day)}
-  >
-    {day.substring(0, 3).toUpperCase()}
-  </span>
-))}
-  </div>
-</div>
-          </>
-        )}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search by item name..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="search-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </div>
 
-        {loading ? (
-          // Show a big spinner centered
-          <div className="spinner-container">
-            <div className="loading-spinner-large"></div>
+      <div ref={pdfRef}>
+          <div className="today-date">
+            <strong>
+              {todayDay.charAt(0).toUpperCase() + todayDay.slice(1)}, {today.toLocaleDateString()}
+            </strong>
           </div>
-        ) : (
-          // Show sorted cards
-          <div className="card-container">
-            {selectedCategory && sortedItems.length === 0 ? (
-              <p>
-                No items in <strong>{selectedCategory}</strong> to be Checked for{" "}
-                <strong>{selectedDay}</strong>.
-              </p>
-            ) : (
-              sortedItems.map((item) => (
-                <div
-                  className={`card ${item.checked === "yes" ? "checked" : "not-checked"}`}
-                  key={item.id}
-                  onClick={() => handleCheckboxChange(item)}
-                >
-                  <h2 className="card-title">{item.name}</h2>
-                </div>
-              ))
-            )}
-          </div>
-        )}
 
-        {/* Popup for confirmation */}
-        {popupData.visible && popupData.item && (
-          <div className="popup-overlay" onMouseEnter={() => {}} onMouseLeave={handleClosePopup}>
-            <div className="popup" onMouseEnter={() => {}} onMouseLeave={handleClosePopup}>
-              <p>Mark {popupData.item.name} as checked?</p>
-              <button onClick={handleConfirmCheck}>Yes</button>
-              <button onClick={handleClosePopup}>No</button>
+          {loading || checkingDatabase ? (
+            <div className="spinner-container">
+              <div className="loading-spinner-large"></div>
             </div>
-          </div>
-        )}
+          ) : isGeneratingPDF ? (
+            // Grouped layout for PDF generation
+            <>
+              {selectedCategory && searchedItems.length === 0 ? (
+                <p>
+                  No items matching <strong>{searchTerm}</strong> in{" "}
+                  <strong>{selectedCategory}</strong> for <strong>{selectedDay}</strong>.
+                </p>
+              ) : (
+                <>
+                  <div className="pdf-status-group">
+                    {/* Need Immediately */}
+                    {itemsByStatus["Need Immediately"].length > 0 && (
+                      <>
+                        <h2 className="pdf-status-heading pdf-status-need-immediately">
+                          Need those items immediately:
+                        </h2>
+                        <ul>
+                          {itemsByStatus["Need Immediately"].map((item) => (
+                            <li key={item.id}>{item.name}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
+                    {/* Need Soon */}
+                    {itemsByStatus["Need Soon"].length > 0 && (
+                      <>
+                        <h2 className="pdf-status-heading pdf-status-need-soon">
+                          Need those items sooner:
+                        </h2>
+                        <ul>
+                          {itemsByStatus["Need Soon"].map((item) => (
+                            <li key={item.id}>{item.name}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
+                    {/* We are Good */}
+                    {itemsByStatus["We are Good"].length > 0 && (
+                      <>
+                        <h2 className="pdf-status-heading pdf-status-we-are-good">
+                          We are good with those items:
+                        </h2>
+                        <ul>
+                          {itemsByStatus["We are Good"].map((item) => (
+                            <li key={item.id}>{item.name}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
+                    {/* Pending */}
+                    {itemsByStatus["pending"].length > 0 && (
+                      <>
+                        <h2 className="pdf-status-heading pdf-status-pending">
+                          Didn't check those items in inventory:
+                        </h2>
+                        <ul>
+                          {itemsByStatus["pending"].map((item) => (
+                            <li key={item.id}>{item.name}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="card-container">
+              {selectedCategory && searchedItems.length === 0 ? (
+                <p>
+                  No items matching <strong>{searchTerm}</strong> in{" "}
+                  <strong>{selectedCategory}</strong> for <strong>{selectedDay}</strong>.
+                </p>
+              ) : (
+                searchedItems.map((item) => {
+                  let statusClass = "";
+                  switch (item.status) {
+                    case "pending": statusClass = "pending"; break;
+                    case "Need Immediately": statusClass = "danger"; break;
+                    case "Need Soon": statusClass = "warning"; break;
+                    case "We are Good": statusClass = "success"; break;
+                  }
+                  return (
+                    <div
+                      className={`card ${statusClass}`}
+                      key={item.id}
+                      onClick={() => handleCheckboxChange(item)}
+                    >
+                      <h2 className="card-title">{item.name}</h2>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {popupData.visible && (
+            <div className="popup-overlay" onMouseLeave={handleClosePopup}>
+              <div className="popup">
+                <div className="close-button" onClick={handleClosePopup}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </div>
+
+                {popupData.item === "confirm" ? (
+                  <>
+                    <p>
+                      Are you sure you want to update status of{" "}
+                      <strong>{currentItem?.name || "this item"}</strong>?
+                    </p>
+                    <div className="popup-buttons">
+                      <button className="popup-btn success" onClick={() => handleConfirmCheck()}>
+                        Yes
+                      </button>
+                      <button className="popup-btn danger" onClick={() => setPopupData((prev) => ({ ...prev, item: null }))}>
+                        No
+                      </button>
+                    </div>
+                  </>
+                ) : popupData.item && typeof popupData.item === "object" ? (
+                  <>
+                    <p>Mark <strong>{popupData.item.name}</strong> as</p>
+                    <div className="popup-buttons">
+                      <button className="popup-btn danger" onClick={() => handleConfirmCheck("Need Immediately")}>Need Immediately</button>
+                      <button className="popup-btn warning" onClick={() => handleConfirmCheck("Need Soon")}>Need Soon</button>
+                      <button className="popup-btn success" onClick={() => handleConfirmCheck("We are Good")}>We are Good</button>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* PDF Download Button */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}>
+          {searchedItems.length > 0 && (
+            <button
+              onClick={handleDownloadPDF}
+              disabled={isGeneratingPDF}
+              style={{
+                padding: "0.7rem 1.4rem",
+                background: isGeneratingPDF ? "#a77b5a" : "#8B4513",
+                color: "white",
+                fontWeight: "bold",
+                border: "none",
+                borderRadius: "6px",
+                cursor: isGeneratingPDF ? "default" : "pointer",
+                fontSize: "1rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              {isGeneratingPDF ? (
+                <>
+                  <div className="small-spinner" style={{width:16,height:16,border:"2px solid rgba(255,255,255,0.6)",borderTop:"2px solid white",borderRadius:"50%",animation:"spin 1s linear infinite"}} />
+                  Generating...
+                </>
+              ) : (
+                "Download PDF"
+              )}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
 export default InventoryCheckByCategoryAndDay;
-
-/* Make sure you add these styles to your CSS for the spinner: */
-/*
-.loading-spinner-large {
-  border: 6px solid #f3f3f3; 
-  border-top: 6px solid #333; 
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-}
-
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px; // or your desired height
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-*/

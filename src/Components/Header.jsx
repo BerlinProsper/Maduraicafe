@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import { useMyContext } from "../Contexts/myContext";
 export default function Header() {
   const navigate = useNavigate();
-  const { fetchServices, addCheckList, inventory } = useMyContext();
+  const { fetchServices, addCheckList, inventory, checkingDatabase } = useMyContext();
 
   useEffect(() => {
     fetchServices();
