@@ -420,7 +420,7 @@ useEffect(() => {
                     {itemsByStatus["Need Immediately"].length > 0 && (
                       <>
                         <h2 className="pdf-status-heading pdf-status-need-immediately">
-                          Need those items immediately:
+                          Need these items immediately:
                         </h2>
                         <ul>
                           {itemsByStatus["Need Immediately"].map((item) => (
@@ -434,7 +434,7 @@ useEffect(() => {
                     {itemsByStatus["Need Soon"].length > 0 && (
                       <>
                         <h2 className="pdf-status-heading pdf-status-need-soon">
-                          Need those items sooner:
+                          Need these items sooner:
                         </h2>
                         <ul>
                           {itemsByStatus["Need Soon"].map((item) => (
@@ -448,7 +448,7 @@ useEffect(() => {
                     {itemsByStatus["We are Good"].length > 0 && (
                       <>
                         <h2 className="pdf-status-heading pdf-status-we-are-good">
-                          We are good with those items:
+                          We are good with these items:
                         </h2>
                         <ul>
                           {itemsByStatus["We are Good"].map((item) => (
@@ -461,7 +461,7 @@ useEffect(() => {
                     {itemsByStatus["pending"].length > 0 && (
                       <>
                         <h2 className="pdf-status-heading pdf-status-pending">
-                          Didn't check those items in inventory:
+                          Didn't check these items in inventory:
                         </h2>
                         <ul>
                           {itemsByStatus["pending"].map((item) => (
