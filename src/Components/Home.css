@@ -13,11 +13,18 @@
 
 /* Optional: style for the main container */
 .homepage-container {
+  display: flex;
+  justify-content: center;   /* horizontal centering */
+  align-items: center;       /* vertical centering */
   text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 2rem;
   max-width: 90%;
+  min-height: 100vh;         /* ensures full screen height */
+  margin: 0 auto;            /* optional: centers horizontally if width is limited */
+  box-sizing: border-box;    /* ensures padding doesn't break layout */
 }
+
 
 /* Title styles (unchanged or modify as needed) */
 .title {

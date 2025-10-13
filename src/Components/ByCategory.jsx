@@ -333,7 +333,7 @@ document.head.appendChild(style);
   return (
     <div className="fullscreen-wrapper">
       <div className="category-page">
-        <h1 className="title">Inventory Schedule</h1>
+        <h1 className="title">Inventory Checkup</h1>
 
         <div className="custom-dropdown">
           <select
