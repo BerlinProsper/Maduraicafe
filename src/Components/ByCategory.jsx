@@ -9,7 +9,7 @@ const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'fri
 const today = new Date();
 const todayDay = daysOfWeek[today.getDay()];
 const allDays = [todayDay];
-
+    
 const InventoryCheckByCategoryAndDay = () => {
   const { checkingDatabase } = useMyContext();
   const [inventory, setInventory] = useState([]);
@@ -286,6 +286,27 @@ useEffect(() => {
         id: doc.id,
         ...doc.data()
       }));
+      // Sort inventoryList by category order
+      const categoryOrder = [
+        'Front',
+        'Hot Servings',
+        'Deep fry ',
+        'Sauces',
+        'Breads',
+        'Grill and others',
+        'Confectionery',
+        'Boxes',
+        'Utensils counter',
+        'Walk in Freezer',
+        'Walk in Cooler',
+        'Drinks',
+        'Freezer-Outside'
+      ];
+      inventoryList.sort((a, b) => {
+        const idxA = categoryOrder.findIndex(cat => cat.toLowerCase() === (a.category || '').toLowerCase());
+        const idxB = categoryOrder.findIndex(cat => cat.toLowerCase() === (b.category || '').toLowerCase());
+        return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+      });
       setInventory(inventoryList);
     } catch (error) {
       console.error("Error fetching services: ", error);
