@@ -68,7 +68,7 @@ export default function AddInventoryItem() {
       });
 setFormData({
         name: '',
-        category: 'ingredient',
+        category: 'Front',
         checkFrequency: 'daily',
         lastChecked: new Date().toISOString(),
         isAvailable: false,
