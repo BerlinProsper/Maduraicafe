@@ -74,7 +74,6 @@ setFormData({
         isAvailable: false,
         checkDays: weekDays,
       });
-      alert("Item added successfully!");
     } catch (e) {
       console.error(e);
       alert("Error adding document.");
