@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDb } from '../utils/lazyFirebase';
 
-const categories = ['Front','Hot Servings', 'Deep fry -1','Sauces-2', 'Breads', 'Grill and others','Confectionery','Boxes','Utensils counter','Walk in Freezer','Walk in Cooler','Drinks','Freezer-Outside']; 
+const categories = ['Front','Hot Servings', 'Deep fry ','Sauces', 'Breads', 'Grill and others','Confectionery','Boxes','Utensils counter','Walk in Freezer','Walk in Cooler','Drinks','Freezer-Outside']; 
 const frequencies = ['daily','selected days'];
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
