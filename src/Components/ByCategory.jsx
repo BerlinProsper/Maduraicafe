@@ -25,129 +25,129 @@ const InventoryCheckByCategoryAndDay = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Inject responsive + PDF styles
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.setAttribute("data-inventory-pdf", "true");
-style.innerHTML = `
-  @media (max-width: 600px) {
-    body {
-      font-size: 8px;
+useEffect(() => {
+  const style = document.createElement("style");
+  style.setAttribute("data-inventory-pdf", "true");
+  style.innerHTML = `
+    @media (max-width: 600px) {
+      body {
+        font-size: 8px;
+      }
+      h2, h3 {
+        font-size: 13px !important;
+        text-align: center;
+      }
+      li {
+        padding: 0.75rem !important;
+      }
+      li > div {
+        flex-direction: column !important;
+        gap: 8px;
+      }
+      li span {
+        font-size: 10px !important;
+      }
+      input, button {
+        font-size: 10px !important;
+      }
+      .tab-buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
     }
-    h2, h3 {
-      font-size: 13px !important;
-      text-align: center;
+
+    .pdf-mode {
+      background: #fff !important;
+      color: #000 !important;
+      font-size: 8px !important;
+      font-family: sans-serif !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
-    li {
-      padding: 0.75rem !important;
+
+    .pdf-mode * {
+      background: none !important;
+      color: #000 !important;
+      font-size: 8px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
     }
-    li > div {
-      flex-direction: column !important;
-      gap: 8px;
+
+    .pdf-mode li {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      gap: 5px !important;
+      border-bottom: 1px solid #ccc !important;
+      list-style: none !important;
+      padding: 2px 0 !important;
+      font-size: 8px !important;
     }
-    li span {
+
+    .pdf-mode li > div {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pdf-mode button {
+      font-size: 5px !important;
+      padding: 1px 1px !important;
+      margin: 1px !important;
+      border-radius: 2px !important;
+      display: inline-block !important;
+    }
+
+    .pdf-mode .tab-buttons {
+      display: none !important;
+    }
+
+    .pdf-mode h2,
+    .pdf-mode h3,
+    .pdf-mode h4 {
       font-size: 10px !important;
+      font-weight: bold;
+      margin: 6px 0;
+      text-align: left;
     }
-    input, button {
+
+    /* 👇 Scoped PDF headings by status */
+    .pdf-mode .pdf-status-heading {
       font-size: 10px !important;
+      font-weight: bold !important;
+      margin: 6px 0 4px 0 !important;
+      text-align: left !important;
     }
-    .tab-buttons {
-      flex-direction: column;
-      gap: 8px;
+
+    .pdf-mode .pdf-status-need-immediately {
+      color: #e60000 !important; /* red */
     }
-  }
 
-  .pdf-mode {
-    background: #fff !important;
-    color: #000 !important;
-    font-size: 8px !important;
-    font-family: sans-serif !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
+    .pdf-mode .pdf-status-need-soon {
+      color: #ff6600 !important; /* orange */
+    }
 
-  .pdf-mode * {
-    background: none !important;
-    color: #000 !important;
-    font-size: 8px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
+    .pdf-mode .pdf-status-we-are-good {
+      color: green !important;
+    }
 
-  .pdf-mode li {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 5px !important;
-    border-bottom: 1px solid #ccc !important;
-    list-style: none !important;
-    padding: 2px 0 !important;
-    font-size: 8px !important;
-  }
+    .pdf-mode .pdf-status-pending {
+      color: black !important;
+      font-weight: normal !important;
+    }
 
-  .pdf-mode li > div {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .pdf-mode button {
-    font-size: 5px !important;
-    padding: 1px 1px !important;
-    margin: 1px !important;
-    border-radius: 2px !important;
-    display: inline-block !important;
-  }
-
-  .pdf-mode .tab-buttons {
-    display: none !important;
-  }
-
-  .pdf-mode h2,
-  .pdf-mode h3,
-  .pdf-mode h4 {
-    font-size: 10px !important;
-    font-weight: bold;
-    margin: 6px 0;
-    text-align: left;
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  /* 👇 Custom PDF status heading styles */
-  .pdf-status-heading {
-    font-size: 10px !important;
-    margin: 4px 0 !important;
-  }
-
-  .pdf-status-we-are-good {
-    color: green !important;
-    font-weight: bold !important;
-  }
-
-  .pdf-status-pending {
-    color: black !important;
-    font-weight: normal !important;
-  }
-
-  .pdf-status-need-soon {
-    color: #ff6600 !important; /* bright orange */
-    font-weight: bold !important;
-  }
-
-  .pdf-status-need-immediately {
-    color: #e60000 !important; /* bright red */
-    font-weight: bold !important;
-  }
-`;
-document.head.appendChild(style);
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
   return () => document.head.removeChild(style);
-  }, []);
+}, []);
+
 
   const handleDownloadPDF = async () => {
     const input = pdfRef.current;

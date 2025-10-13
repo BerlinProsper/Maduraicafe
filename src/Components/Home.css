@@ -385,26 +385,23 @@ html, body {
 
 
 .pdf-status-heading {
-  font-size: 1.5rem; /* Adjust size as needed */
-  margin-bottom: 1rem;
-}
-
-/* ✅ Green bold text */
-.pdf-status-we-are-good {
-  color: green;
-  font-weight: bold;
-}
-
-/* ✅ Black normal-weight text */
-.pdf-status-pending {
-  color: black;
-  font-weight: normal;
-}
-
-.pdf-status-need-soon {
-  color: #ff6600; /* A brighter orange */
+  font-size: 12px !important;
+  font-weight: bold !important;
+  margin: 10px 0 4px 0 !important;
 }
 
 .pdf-status-need-immediately {
-  color: #e60000; /* A stronger red */
+  color: red !important;
+}
+
+.pdf-status-need-soon {
+  color: orange !important;
+}
+
+.pdf-status-we-are-good {
+  color: green !important;
+}
+
+.pdf-status-pending {
+  color: black !important;
 }
