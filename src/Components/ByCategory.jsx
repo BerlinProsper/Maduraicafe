@@ -136,7 +136,7 @@ useEffect(() => {
     }
 
     .pdf-mode .pdf-status-pending {
-      color: black !important;
+      color: brown !important;
       font-weight: normal !important;
     }
 
