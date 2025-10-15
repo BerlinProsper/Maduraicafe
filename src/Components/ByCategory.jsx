@@ -3,6 +3,7 @@ import "./Category.css";
 // load firebase/firestore dynamically where needed to avoid bundling it into the main chunk
 import { useMyContext } from "../Contexts/myContext";
 // load html2canvas and jspdf dynamically inside handler to keep them out of main bundle
+import { Bars } from 'react-loading-icons'
 
 const categories = ['ALL','Front','Hot Servings', 'Deep fry ','Sauces', 'Breads', 'Grill and others','Confectionery','Boxes','Utensils counter','Walk in Freezer','Walk in Cooler','Drinks','Freezer-Outside']; 
 const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -403,7 +404,7 @@ useEffect(() => {
 
           {loading || checkingDatabase ? (
             <div className="spinner-container">
-              <div className="loading-spinner-large"></div>
+<Bars />
             </div>
           ) : isGeneratingPDF ? (
             // Grouped layout for PDF generation
