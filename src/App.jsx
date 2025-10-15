@@ -1,18 +1,14 @@
-import React from 'react'
 import HomePage from './Components/Home'
 import AddInventoryItem from './Components/inventortForm'
 import { MyProvider } from './Contexts/myContext'
 import InventoryCategoryView from './Components/ByCategory'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
-
 function App() {
   return (
     <MyProvider>
       <Router>
-        {/* Place Header outside Routes so it appears on all pages */}
         <Header />
-
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/add" element={<AddInventoryItem />} />
