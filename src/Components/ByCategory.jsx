@@ -24,8 +24,6 @@ const InventoryCheckByCategoryAndDay = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const pdfRef = useRef();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-
-  // Inject responsive + PDF styles
 useEffect(() => {
   const style = document.createElement("style");
   style.setAttribute("data-inventory-pdf", "true");
@@ -64,6 +62,7 @@ useEffect(() => {
       font-family: sans-serif !important;
       padding: 0 !important;
       margin: 0 !important;
+      padding-left: 10px !important; /* 👈 Added left padding to container */
     }
 
     .pdf-mode * {
@@ -74,6 +73,16 @@ useEffect(() => {
       margin: 0 !important;
       border: none !important;
       box-shadow: none !important;
+    }
+
+    /* 👇 Add left padding to specific elements for better spacing */
+    .pdf-mode h2,
+    .pdf-mode h3,
+    .pdf-mode h4,
+    .pdf-mode li,
+    .pdf-mode .pdf-status-heading,
+    .pdf-mode .today-date {
+      padding-left: 10px !important;
     }
 
     .pdf-mode li {
@@ -136,8 +145,15 @@ useEffect(() => {
     }
 
     .pdf-mode .pdf-status-pending {
-      color: black !important;
-      font-weight: normal !important;
+      color: brown !important;
+    }
+
+    /* 👇 Optional: Center the today-date text */
+    .pdf-mode .today-date {
+      text-align: center !important;
+      font-weight: bold !important;
+      font-size: 10px !important;
+      margin: 8px 0 !important;
     }
 
     @keyframes spin {

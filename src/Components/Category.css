@@ -12,6 +12,13 @@
   align-items: center;
   z-index: 1000;
 }
+.today-date {
+  text-align: center;        /* Center text horizontally */
+  font-weight: bold;         /* Ensure it's bold */
+  margin: 10px 0;            /* Optional: add some vertical spacing */
+  font-size: 12px;           /* Optional: make it more readable in PDF */
+}
+
 
 .popup {
   position: relative;

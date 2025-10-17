@@ -9,6 +9,12 @@
   padding: 2rem 1rem; /* optional: avoid content touching edges */
   flex-direction: column; /* ensure children stack properly */
 }
+.today-date {
+  text-align: center;        /* Center text horizontally */
+  font-weight: bold;         /* Ensure it's bold */
+  margin: 10px 0;            /* Optional: add some vertical spacing */
+  font-size: 12px;           /* Optional: make it more readable in PDF */
+}
 
 
 /* Optional: style for the main container */
