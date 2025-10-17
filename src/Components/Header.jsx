@@ -26,7 +26,7 @@ export default function Header() {
 
   return (
     <AppBar
-      position="static"
+      position="fixed"
       width="100%"
       sx={{
         backgroundColor: '#633b11',  // beige background

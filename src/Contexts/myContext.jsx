@@ -40,16 +40,16 @@ const addCheckList = async () => {
   const todayIndex = today.getDay();
   const todayDay = daysOfWeek[todayIndex];
 
-  // Get yesterday, today, and next two days
-  const yesterdayDay = daysOfWeek[(todayIndex + 6) % 7]; // +6 instead of -1 to wrap
   const nextDay1 = daysOfWeek[(todayIndex + 1) % 7];
   const nextDay2 = daysOfWeek[(todayIndex + 2) % 7];
+  const deleteDay1 = daysOfWeek[(todayIndex + 3) % 7];
+  const deleteDay2 = daysOfWeek[(todayIndex + 4) % 7];
 
-  const keepDays = [yesterdayDay, todayDay];
+  const keepDays = [todayDay, nextDay1, nextDay2];
+  const deleteDays = [deleteDay1, deleteDay2];
 
-  // ❌ Delete collections for all days except yesterday and today
-  const daysToDelete = daysOfWeek.filter(day => !keepDays.includes(day));
-  for (const day of daysToDelete) {
+  // ❌ Delete only specific future days (day+3, day+4)
+  for (const day of deleteDays) {
     const db = await getDb();
     const [{ collection, getDocs, deleteDoc, doc }] = await Promise.all([
       import('firebase/firestore'),
@@ -62,7 +62,7 @@ const addCheckList = async () => {
   }
 
   console.log("Keeping:", keepDays);
-  console.log("Adding data for:", [todayDay, nextDay1, nextDay2]);
+  console.log("Deleting:", deleteDays);
 
   const todayDate = today.toISOString().split('T')[0];
   const [{ collection: _collection, query: _query, where: _where, getDocs: _getDocs, addDoc: _addDoc, serverTimestamp: _serverTimestamp }] = await Promise.all([
@@ -70,9 +70,9 @@ const addCheckList = async () => {
   ]).then(mods => [mods[0]]);
 
   const db = await getDb();
-
   const targetDays = [todayDay, nextDay1, nextDay2];
 
+  // ✅ Add data to today, tomorrow, day after
   for (const day of targetDays) {
     const filteredInventory = inventory.filter(item =>
       item.checkDays && item.checkDays.includes(day)
